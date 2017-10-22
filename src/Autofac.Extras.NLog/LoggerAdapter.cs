@@ -53,7 +53,7 @@ namespace Autofac.Extras.NLog
 
         public void Log(LogEventInfo logEvent)
         {
-            _logger.Log(logEvent);
+           _logger.Log( GetType(), logEvent );
         }
 
         public void Log(Type wrapperType, LogEventInfo logEvent)
