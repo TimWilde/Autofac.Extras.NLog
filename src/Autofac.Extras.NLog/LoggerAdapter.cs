@@ -51,74 +51,74 @@ namespace Autofac.Extras.NLog
             return _logger.IsEnabled(level);
         }
 
-        public void Log(LogEventInfo logEvent)
+        public void LogException( LogLevel level, string message, Exception exception )
+        {
+            _logger.Log( GetType(), LogEventInfo.Create( level, Name, exception, null, message ) );
+        }
+
+       public void Log(LogEventInfo logEvent)
         {
            _logger.Log( GetType(), logEvent );
         }
 
-        public void Log(Type wrapperType, LogEventInfo logEvent)
+       public void Log(Type wrapperType, LogEventInfo logEvent)
         {
             _logger.Log(wrapperType, logEvent);
         }
 
-        public void Log<T>(LogLevel level, T value)
+       public void Log<T>(LogLevel level, T value)
         {
-            _logger.Log(level, value);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, null, value ) );
         }
 
-        public void Log<T>(LogLevel level, IFormatProvider formatProvider, T value)
+       public void Log<T>(LogLevel level, IFormatProvider formatProvider, T value)
         {
-            _logger.Log(level, formatProvider, value);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, formatProvider, value ) );
         }
 
-        public void LogException(LogLevel level, string message, Exception exception)
-        {
-            _logger.Log(level, exception, message);
-        }
-
-        public void Log(LogLevel level, IFormatProvider formatProvider, string message, params object[] args)
-        {
-            _logger.Log(level, formatProvider, message, args);
+       public void Log(LogLevel level, IFormatProvider formatProvider, string message, params object[] args)
+       {
+          _logger.Log( GetType(), LogEventInfo.Create( level, Name, formatProvider, message, args ) );
         }
 
         public void Log(LogLevel level, string message)
         {
-            _logger.Log(level, message);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, null, message ) );
         }
 
         public void Log(LogLevel level, string message, params object[] args)
         {
-            _logger.Log(level, message, args);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, null, message, args ) );
         }
 
         public void Log<TArgument>(LogLevel level, IFormatProvider formatProvider, string message, TArgument argument)
         {
-            _logger.Log(level, formatProvider, message, argument);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, formatProvider, message, new object[] { argument } ) );
         }
 
         public void Log<TArgument>(LogLevel level, string message, TArgument argument)
         {
-            _logger.Log(level, message, argument);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, null, message, new object[] { argument } ) );
         }
 
         public void Log<TArgument1, TArgument2>(LogLevel level, IFormatProvider formatProvider, string message, TArgument1 argument1, TArgument2 argument2)
         {
-            _logger.Log(level, formatProvider, message, argument1, argument2);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, formatProvider, message, new object[] { argument1, argument2 } ) );
         }
 
         public void Log<TArgument1, TArgument2>(LogLevel level, string message, TArgument1 argument1, TArgument2 argument2)
         {
-            _logger.Log(level, message, argument1, argument2);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, null, message, new object[] { argument1, argument2 } ) );
         }
 
         public void Log<TArgument1, TArgument2, TArgument3>(LogLevel level, IFormatProvider formatProvider, string message, TArgument1 argument1, TArgument2 argument2, TArgument3 argument3)
         {
-            _logger.Log(level, formatProvider, message, argument1, argument2, argument3);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, formatProvider, message, new object[] { argument1, argument2, argument3 } ) );
         }
 
         public void Log<TArgument1, TArgument2, TArgument3>(LogLevel level, string message, TArgument1 argument1, TArgument2 argument2, TArgument3 argument3)
         {
-            _logger.Log(level, message, argument1, argument2, argument3);
+           _logger.Log( GetType(), LogEventInfo.Create( level, Name, null, message, new object[] { argument1, argument2, argument3 } ) );
         }
 
         public void Trace<T>(T value)

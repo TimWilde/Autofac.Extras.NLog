@@ -18,13 +18,17 @@
 
       private IContainer container;
       private MemoryTarget inMemory;
+      private ILogger logger;
+      private string testMessage;
 
       [ TestFixtureSetUp ]
       public void Set_up_test_fixture()
       {
+         // Configure NLog to log to memory to simplify testing
          inMemory = new MemoryTarget { Layout = layout, Name = "memory" };
          SimpleConfigurator.ConfigureForTargetLogging( inMemory, NLogFramework.LogLevel.Trace );
 
+         // Configure Autofac container
          ContainerBuilder containerBuilder = new ContainerBuilder();
 
          containerBuilder.RegisterModule<NLogModule>();
@@ -32,13 +36,11 @@
          containerBuilder.RegisterType<SampleClassWithPropertyDependency>().Named<ISampleClass>( "property" );
 
          container = containerBuilder.Build();
-      }
 
-      [ SetUp ]
-      public void Set_up_test_context()
-      {
-         inMemory.Logs.Clear();
-         inMemory.Logs.Count.Should().Be( 0, because: "logs should have been cleared." );
+         // Grab an ILogger which should be an instance of LoggerAdapter
+         logger = container.ResolveNamed<ISampleClass>( "property" ).GetLogger();
+         logger.Should().NotBeNull( because: "should be provided by NLogModule" )
+               .And.BeOfType<LoggerAdapter>( because: "the LoggerAdapter should be provided here" );
       }
 
       [ TestFixtureTearDown ]
@@ -48,24 +50,133 @@
          inMemory.Dispose();
       }
 
-      [ Test ]
-      public void Log_message_contains_correct_callsite()
+      [ SetUp ]
+      public void Set_up_test()
       {
-         ILogger logger = container.ResolveNamed<ISampleClass>( "property" ).GetLogger();
-         logger.Should().NotBeNull( because: "should be provided by NLogModule" );
+         inMemory.Logs.Clear();
+         inMemory.Logs.Count.Should().Be( 0, because: "logs should have been cleared" );
 
-         string testId = $"{Guid.NewGuid():N}";
+         testMessage = $"{Guid.NewGuid():N}";
+      }
 
-         logger.Log( new NLogFramework.LogEventInfo( NLogFramework.LogLevel.Debug, "Something", new CultureInfo( "en-GB" ), testId, null ) );
-
-         var logEntry = inMemory.Logs.Last( x => x.Contains( testId ) );
+      private void Confirm_callsite_value( string methodName )
+      {
+         var logEntry = inMemory.Logs.Last( x => x.Contains( testMessage ) );
          logEntry.Should().NotBeNull( because: "should have logged the message" );
 
          Match match = logLinePattern.Match( logEntry );
-         match.Success.Should().BeTrue( because: "log entry should match the regex pattern" );
+         match.Success.Should().BeTrue( because: "log entry layout should match the regex pattern" );
 
-         match.Groups[ "callsite" ].Value.Should().Be( $"{GetType().FullName}.{nameof(Log_message_contains_correct_callsite)}",
-                                                       because: "should use the client code calling context" );
+         Console.WriteLine( $"Log entry: {logEntry}" );
+         Console.WriteLine( $"Callsite: {match.Groups[ "callsite" ].Value}" );
+
+         match.Groups[ "callsite" ].Value.Should().Be( $"{GetType().FullName}.{methodName}",
+                                                       because: "should use the test method as the callsite context" );
+      }
+
+      [ Test ]
+      public void Passing_a_log_event_info_instance()
+      {
+         logger.Log( new NLogFramework.LogEventInfo( NLogFramework.LogLevel.Debug, "Something", new CultureInfo( "en-GB" ), testMessage, null ) );
+
+         Confirm_callsite_value( nameof(Passing_a_log_event_info_instance) );
+      }
+
+      [ Test ]
+      public void Passing_log_level_and_value()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, new { test = testMessage } );
+
+         Confirm_callsite_value( nameof(Passing_log_level_and_value) );
+      }
+
+      [ Test ]
+      public void Passing_level_format_and_value()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, new CultureInfo( "ja-JP" ), new { Timestamp = DateTime.Now, test = testMessage } );
+
+         Confirm_callsite_value( nameof(Passing_level_format_and_value) );
+      }
+
+      [ Test ]
+      public void Calling_log_exception()
+      {
+         logger.LogException( NLogFramework.LogLevel.Debug, testMessage, new Exception( "This is a test exception!" ) );
+
+         Confirm_callsite_value( nameof(Calling_log_exception) );
+      }
+
+      [ Test ]
+      public void Passing_level_format_message_and_args()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, new CultureInfo( "ja-JP" ), "Date: {0}, test: {1}", new object[] { DateTime.Now, testMessage } );
+
+         Confirm_callsite_value( nameof(Passing_level_format_message_and_args) );
+      }
+
+      [ Test ]
+      public void Passing_level_and_message()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, testMessage );
+
+         Confirm_callsite_value( nameof(Passing_level_and_message) );
+      }
+
+      [ Test ]
+      public void Passing_level_message_and_args()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, "Date: {0}, Message: {1}", new object[] { DateTime.Now, testMessage } );
+
+         Confirm_callsite_value( nameof(Passing_level_message_and_args) );
+      }
+
+      [ Test ]
+      public void Passing_level_format_message_and_typed_arg()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, new CultureInfo( "ja-JP" ), $"Date: {{0}}, Message: {testMessage}", DateTime.Now );
+
+         Confirm_callsite_value( nameof(Passing_level_format_message_and_typed_arg) );
+      }
+
+      [ Test ]
+      public void Passing_level_message_and_typed_argument()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, $"Date: {{0}}, Message: {testMessage}", DateTime.Now );
+
+         Confirm_callsite_value( nameof(Passing_level_message_and_typed_argument) );
+      }
+
+      [ Test ]
+      public void Passing_level_format_message_and_two_typed_arguments()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, new CultureInfo( "ja-JP" ), $"Start: {{0}}, End: {{1}}, {testMessage}", DateTime.Today, DateTime.Now );
+
+         Confirm_callsite_value( nameof(Passing_level_format_message_and_two_typed_arguments) );
+      }
+
+      [ Test ]
+      public void Passing_level_message_and_two_typed_arguments()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, $"Start: {{0}}, End: {{1}}, {testMessage}", DateTime.Today, DateTime.Now );
+
+         Confirm_callsite_value( nameof(Passing_level_message_and_two_typed_arguments) );
+      }
+
+      [ Test ]
+      public void Passing_level_format_message_and_three_typed_arguments()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, new CultureInfo( "ja-JP" ), $"Start: {{0}}, End: {{1}}, Max: {{2}}, {testMessage}",
+                     DateTime.Today, DateTime.Now, DateTime.MaxValue );
+
+         Confirm_callsite_value( nameof(Passing_level_format_message_and_three_typed_arguments) );
+      }
+
+      [ Test ]
+      public void Passing_level_message_and_three_typed_arguments()
+      {
+         logger.Log( NLogFramework.LogLevel.Debug, $"Start: {{0}}, End: {{1}}, Max: {{2}}, {testMessage}", DateTime.Today, DateTime.Now, DateTime.MaxValue );
+
+         Confirm_callsite_value( nameof(Passing_level_message_and_three_typed_arguments) );
       }
    }
 }
