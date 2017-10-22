@@ -77,13 +77,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ISampleClass.cs" />
-    <Compile Include="LoggerAdapterTests.cs" />
+    <Compile Include="When_calling_overrides_of_the_debug_method.cs" />
+    <Compile Include="When_calling_overrides_of_the_error_method.cs" />
+    <Compile Include="When_calling_overrides_of_the_fatal_method.cs" />
+    <Compile Include="When_calling_overrides_of_the_info_method.cs" />
+    <Compile Include="When_calling_overrides_of_the_log_method.cs" />
+    <Compile Include="LoggerAdapterTestsBase.cs" />
     <Compile Include="SampleClassToResolveLoggerFromServiceLocator.cs" />
     <Compile Include="SimpleNLogModuleTests.cs" />
     <Compile Include="SampleClassWithConstructorDependency.cs" />
     <Compile Include="SampleClassWithPropertyDependency.cs" />
     <Compile Include="NLogModuleTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="When_calling_overrides_of_the_trace_method.cs" />
+    <Compile Include="When_calling_overrides_of_the_warn_method.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

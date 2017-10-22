@@ -56,15 +56,25 @@ namespace Autofac.Extras.NLog
             _logger.Log( GetType(), LogEventInfo.Create( level, Name, exception, null, message ) );
         }
 
+       private void LogException( LogLevel level, Exception exception, string message, params object[] arguments )
+       {
+          _logger.Log( GetType(), LogEventInfo.Create( level, Name, exception, null, message, arguments ) );
+       }
+
+       private void LogException( LogLevel level, Exception exception, IFormatProvider formatProvider, string message, params object[] arguments )
+       {
+          _logger.Log( GetType(), LogEventInfo.Create( level, Name, exception, formatProvider, message, arguments ) );
+       }
+
        public void Log(LogEventInfo logEvent)
         {
-           _logger.Log( GetType(), logEvent );
+            Log( GetType(), logEvent );
         }
 
        public void Log(Type wrapperType, LogEventInfo logEvent)
-        {
-            _logger.Log(wrapperType, logEvent);
-        }
+       {
+          _logger.Log( wrapperType, logEvent );
+       }
 
        public void Log<T>(LogLevel level, T value)
         {
@@ -123,142 +133,142 @@ namespace Autofac.Extras.NLog
 
         public void Trace<T>(T value)
         {
-            _logger.Trace(value);
+           Log( LogLevel.Trace, value );
         }
 
         public void Trace<T>(IFormatProvider formatProvider, T value)
         {
-            _logger.Trace(formatProvider, value);
+           Log( LogLevel.Trace, formatProvider, value );
         }
 
         public void Trace(string message, Exception exception)
         {
-            _logger.Trace(exception, message);
+           Log( LogLevel.Trace, message, exception );
         }
 
         public void Trace(Exception exception, string message, params object[] args)
         {
-            _logger.Trace(exception, message);
+           LogException( LogLevel.Trace, exception, message, args );
         }
 
         public void Trace(Exception exception, IFormatProvider formatProvider, string message, params object[] args)
         {
-            _logger.Trace(exception, formatProvider, message, args);
+           LogException( LogLevel.Trace, exception, formatProvider, message, args );
         }
 
         public void Trace(IFormatProvider formatProvider, string message, params object[] args)
         {
-            _logger.Trace(formatProvider, message, args);
+           Log( LogLevel.Trace, formatProvider, message, args );
         }
 
         public void Trace(string message)
         {
-            _logger.Trace(message);
+           Log( LogLevel.Trace, message );
         }
 
         public void Trace(string message, params object[] args)
         {
-            _logger.Trace(message, args);
+           Log( LogLevel.Trace, message, args );
         }
 
         public void Trace<TArgument>(IFormatProvider formatProvider, string message, TArgument argument)
         {
-            _logger.Trace(formatProvider, message, argument);
+           Log( LogLevel.Trace, formatProvider, message, argument );
         }
 
         public void Trace<TArgument>(string message, TArgument argument)
         {
-            _logger.Trace(message, argument);
+           Log( LogLevel.Trace, message, argument );
         }
 
         public void Trace<TArgument1, TArgument2>(IFormatProvider formatProvider, string message, TArgument1 argument1, TArgument2 argument2)
         {
-            _logger.Trace(formatProvider, message, argument1, argument2);
+           Log( LogLevel.Trace, formatProvider, message, argument1, argument2 );
         }
 
         public void Trace<TArgument1, TArgument2>(string message, TArgument1 argument1, TArgument2 argument2)
         {
-            _logger.Trace(message, argument1, argument2);
+           Log( LogLevel.Trace, message, argument1, argument2 );
         }
 
         public void Trace<TArgument1, TArgument2, TArgument3>(IFormatProvider formatProvider, string message, TArgument1 argument1, TArgument2 argument2, TArgument3 argument3)
         {
-            _logger.Trace(formatProvider, message, argument1, argument2, argument3);
+           Log( LogLevel.Trace, formatProvider, message, argument1, argument2, argument3 );
         }
 
         public void Trace<TArgument1, TArgument2, TArgument3>(string message, TArgument1 argument1, TArgument2 argument2, TArgument3 argument3)
         {
-            _logger.Trace(message, argument1, argument2, argument3);
+           Log( LogLevel.Trace, message, argument1, argument2, argument3 );
         }
 
         public void Debug<T>(T value)
         {
-            _logger.Debug(value);
+           Log( LogLevel.Debug, value );
         }
 
         public void Debug<T>(IFormatProvider formatProvider, T value)
         {
-            _logger.Debug(formatProvider, value);
+           Log( LogLevel.Debug, formatProvider, value );
         }
 
         public void Debug(string message, Exception exception)
         {
-            _logger.Debug(exception, message);
+           LogException( LogLevel.Debug, exception, message );
         }
 
         public void Debug(Exception exception, string message, params object[] args)
         {
-            _logger.Debug(exception, message, args);
+           LogException( LogLevel.Debug, exception, message, args );
         }
 
         public void Debug(Exception exception, IFormatProvider formatProvider, string message, params object[] args)
         {
-            _logger.Debug(exception, formatProvider, message, args);
+           LogException( LogLevel.Debug, exception, formatProvider, message, args );
         }
 
         public void Debug(IFormatProvider formatProvider, string message, params object[] args)
         {
-            _logger.Debug(formatProvider, message, args);
+           Log( LogLevel.Debug, formatProvider, message, args );
         }
 
         public void Debug(string message)
         {
-            _logger.Debug(message);
+           Log( LogLevel.Debug, message );
         }
 
         public void Debug(string message, params object[] args)
         {
-            _logger.Debug(message, args);
+           Log( LogLevel.Debug, message, args );
         }
 
         public void Debug<TArgument>(IFormatProvider formatProvider, string message, TArgument argument)
         {
-            _logger.Debug(formatProvider, message, argument);
+           Log( LogLevel.Debug, formatProvider, message, argument );
         }
 
         public void Debug<TArgument>(string message, TArgument argument)
         {
-            _logger.Debug(message, argument);
+           Log( LogLevel.Debug, message, argument );
         }
 
         public void Debug<TArgument1, TArgument2>(IFormatProvider formatProvider, string message, TArgument1 argument1, TArgument2 argument2)
         {
-            _logger.Debug(formatProvider, message, argument1, argument2);
+           Log( LogLevel.Debug, formatProvider, message, argument1, argument2 );
         }
 
         public void Debug<TArgument1, TArgument2>(string message, TArgument1 argument1, TArgument2 argument2)
         {
-            _logger.Debug(message, argument1, argument2);
+           Log( LogLevel.Debug, message, argument1, argument2 );
         }
 
         public void Debug<TArgument1, TArgument2, TArgument3>(IFormatProvider formatProvider, string message, TArgument1 argument1, TArgument2 argument2, TArgument3 argument3)
         {
-            _logger.Debug(formatProvider, message, argument1, argument2, argument3);
+           Log( LogLevel.Debug, formatProvider, message, argument1, argument2, argument3 );
         }
 
         public void Debug<TArgument1, TArgument2, TArgument3>(string message, TArgument1 argument1, TArgument2 argument2, TArgument3 argument3)
         {
-            _logger.Debug(message, argument1, argument2, argument3);
+           Log( LogLevel.Debug, message, argument1, argument2, argument3 );
         }
 
         public void Info<T>(T value)
